@@ -31,7 +31,6 @@ jobs:
           docker build -f Dockerfile.dev -t react-test-dev .
           docker run --rm -e CI=true react-test-dev npm test
 
-      # --- Build and Push Production Image ---
       - name: Build and push production Docker image
         uses: docker/build-push-action@v5
         with:
@@ -41,3 +40,9 @@ jobs:
           tags: |
             ${{ env.DOCKER_IMAGE }}:latest
             ${{ env.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
+    
+      - name: Trigger Render Deploy Hook
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
